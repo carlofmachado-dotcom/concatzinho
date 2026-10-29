@@ -42,7 +42,9 @@ pub const FIRST_SWITCHABLE: Version = Version::new(0, 2, 5);
 
 /// GitHub's list of the repository's releases, newest first. A hundred
 /// covers years of releases at this pace.
-const RELEASES_URL: &str = "https://api.github.com/repos/jub0t/Concat/releases?per_page=100";
+// SynviaADS: procura versões no fork da Synvia, não no Concat original, para ninguém trocar
+// o app da Synvia pelo Concat sem querer.
+const RELEASES_URL: &str = "https://api.github.com/repos/carlofmachado-dotcom/concatzinho/releases?per_page=100";
 
 /// What a download that was stopped says.
 pub const CANCELLED: &str = "the download was cancelled";

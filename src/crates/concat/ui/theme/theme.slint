@@ -101,7 +101,7 @@ export global Theme {
     // Both are Hanken Grotesk, the one face this build bundles (app.slint).
     // The split between the roles stays so that the two can differ again
     // without touching a single element.
-    out property <string> font: "Hanken Grotesk";
+    out property <string> font: "Manrope";  // SynviaADS: a fonte da Synvia
     out property <string> font-technical: "Hanken Grotesk";
     /// The scale. `fs` is the body size everything inherits; the two either
     /// side of it are the dense readout and the panel title. `xl` is for the
@@ -126,12 +126,12 @@ export global Theme {
     // Weight is the one axis that can absorb a renderer difference without
     // touching a colour token, and every face is bundled, so it costs nothing
     // at runtime. Reach for it rather than nudging a surface to compensate.
-    out property <int> weight-body: 400;
-    out property <int> weight-title: 500;
+    out property <int> weight-body: 500;
+    out property <int> weight-title: 600;
     /// The launch screen's heading, and the wordmark in the title bar. The one
     /// weight above `title`, and the only place the type gets to be loud. Bold
     /// is bundled, so this names it exactly.
-    out property <int> weight-display: 700;
+    out property <int> weight-display: 800;
 
     // ── shape ────────────────────────────────────────────────────────────
     //

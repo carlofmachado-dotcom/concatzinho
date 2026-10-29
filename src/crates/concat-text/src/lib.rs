@@ -301,8 +301,15 @@ impl Default for Fonts {
 /// title is set in the face the window is on a machine that has never
 /// installed it. The window embeds the same five files (concat/ui/app.slint).
 /// Licensed under the SIL Open Font License; see fonts/LICENSE-HankenGrotesk.txt.
-pub const BUNDLED_FAMILY: &str = "Hanken Grotesk";
-const BUNDLED: [&[u8]; 5] = [
+/// SynviaADS: Manrope, a fonte da Synvia (SIL Open Font License, fonts/LICENSE-Manrope.txt).
+pub const BUNDLED_FAMILY: &str = "Manrope";
+const BUNDLED: [&[u8]; 10] = [
+    include_bytes!("../fonts/Manrope-Regular.ttf"),
+    include_bytes!("../fonts/Manrope-Medium.ttf"),
+    include_bytes!("../fonts/Manrope-SemiBold.ttf"),
+    include_bytes!("../fonts/Manrope-Bold.ttf"),
+    include_bytes!("../fonts/Manrope-ExtraBold.ttf"),
+    // Hanken Grotesk continua aqui para os projetos que já usam essa fonte.
     include_bytes!("../fonts/HankenGrotesk-Regular.ttf"),
     include_bytes!("../fonts/HankenGrotesk-Medium.ttf"),
     include_bytes!("../fonts/HankenGrotesk-SemiBold.ttf"),
@@ -2866,7 +2873,7 @@ mod tests {
             assert_eq!(picked, bundled, "{retired} is painted in the bundled face");
         }
         let quoted = fonts
-            .pick(&style("\"Hanken Grotesk\"", 700.0, false))
+            .pick(&style(&format!("\"{BUNDLED_FAMILY}\""), 700.0, false))
             .expect("quotes stripped");
         assert_eq!(quoted, bundled);
     }

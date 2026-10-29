@@ -1509,7 +1509,7 @@ component VersionLine inherits HorizontalLayout {
     VerticalLayout {
         alignment: center;
         Text {
-            text: "Concat " + root.version;
+            text: "SynviaADS " + root.version;
             color: Theme.fg-dim;
             font-family: Theme.font-technical;
             font-size: Theme.fs-sm;
@@ -1655,6 +1655,20 @@ component WideHome inherits Rectangle {
                 width: root.main-w;
                 height: self.preferred-height;
                 alignment: start;
+
+                // ── a marca ──────────────────────────────────────────
+                HorizontalLayout {
+                    alignment: start;
+                    Image {
+                        source: Theme.dark
+                            ? @image-url("assets/synvia-logo-escuro.svg")
+                            : @image-url("assets/synvia-logo-claro.svg");
+                        height: 40px;
+                        width: self.height * 157 / 61;
+                    }
+                }
+
+                Rectangle { height: 22px; }
 
                 // ── the greeting ─────────────────────────────────────
                 Text {

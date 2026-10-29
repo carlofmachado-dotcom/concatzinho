@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Monta o Concatzinho.app e instala em /Applications.
+# Monta o SynviaADS.app (o editor de vídeo da Synvia, fork do Concat) e instala em /Applications.
 #
 # Uso, na raiz do repositório:
-#   scripts/macos/empacotar-concatzinho.sh            # usa o binário já compilado
-#   scripts/macos/empacotar-concatzinho.sh --compilar # compila antes (release)
+#   scripts/macos/empacotar-synviaads.sh            # usa o binário já compilado
+#   scripts/macos/empacotar-synviaads.sh --compilar # compila antes (release)
 #
 # Segue o mesmo caminho do Bundle (macOS) em .github/workflows/build-app.yml:
 # binário, ícone, Info.plist e as bibliotecas do FFmpeg copiadas para dentro
@@ -14,8 +14,8 @@ set -euo pipefail
 export PATH="/opt/homebrew/bin:$HOME/.cargo/bin:$PATH"
 raiz="$(cd "$(dirname "$0")/../.." && pwd)"
 alvo="${CARGO_TARGET_DIR:-$HOME/.cache/concatzinho-target}"
-nome="Concatzinho"
-exe="concatzinho"
+nome="SynviaADS"
+exe="synviaads"
 versao="$(grep -m1 '^version' "$raiz/src/Cargo.toml" | sed 's/.*"\(.*\)".*/\1/')"
 commit="$(git -C "$raiz" rev-parse --short HEAD)"
 
@@ -33,7 +33,7 @@ mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources" "$app/Contents/Framewor
 cp "$binario" "$app/Contents/MacOS/$exe"
 
 # Ícone: todos os tamanhos que o macOS pede, a partir do PNG de 1024.
-icone="$raiz/assets/concatzinho/icon_1024.png"
+icone="$raiz/assets/synvia/icon_1024.png"
 iconset="$trabalho/$nome.iconset"
 mkdir "$iconset"
 for t in 16 32 128 256 512; do
@@ -49,7 +49,7 @@ cat > "$app/Contents/Info.plist" <<PLIST
 <dict>
   <key>CFBundleName</key><string>$nome</string>
   <key>CFBundleDisplayName</key><string>$nome</string>
-  <key>CFBundleIdentifier</key><string>com.carlofmachado.concatzinho</string>
+  <key>CFBundleIdentifier</key><string>com.synvia.ads</string>
   <key>CFBundleVersion</key><string>$versao+$commit</string>
   <key>CFBundleShortVersionString</key><string>$versao</string>
   <key>CFBundleExecutable</key><string>$exe</string>
@@ -59,8 +59,8 @@ cat > "$app/Contents/Info.plist" <<PLIST
   <key>NSHighResolutionCapable</key><true/>
   <key>NSSupportsAutomaticGraphicsSwitching</key><true/>
   <key>LSApplicationCategoryType</key><string>public.app-category.video</string>
-  <key>NSHumanReadableCopyright</key><string>Fork do Concat (github.com/jub0t/Concat). AGPL-3.0-or-later.</string>
-  <key>NSMicrophoneUsageDescription</key><string>O Concatzinho grava narração pelo microfone.</string>
+  <key>NSHumanReadableCopyright</key><string>Synvia. Fork do Concat (github.com/jub0t/Concat), AGPL-3.0-or-later.</string>
+  <key>NSMicrophoneUsageDescription</key><string>O SynviaADS grava narração pelo microfone.</string>
 </dict>
 </plist>
 PLIST
@@ -80,3 +80,9 @@ mv "$app" "/Applications/$nome.app"
 rm -rf "$trabalho"
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "/Applications/$nome.app" >/dev/null 2>&1 || true
 echo "Pronto: /Applications/$nome.app ($versao+$commit)"
+
+# O app antigo (Concatzinho) vai para o Lixo: o SynviaADS é a mesma ferramenta com o nome novo.
+if [[ -d /Applications/Concatzinho.app ]]; then
+  pkill -x concatzinho 2>/dev/null || true
+  mv /Applications/Concatzinho.app "$HOME/.Trash/Concatzinho $(date +%H%M%S).app"
+fi
