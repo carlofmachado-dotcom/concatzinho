@@ -289,8 +289,13 @@ pub(crate) fn build_timeline(
         // Quantise to the frame grid on the way in. The UI works in f64
         // seconds; the engine works in exact rationals, and this is the seam
         // where a value stops being approximate.
-        let start = quantise_at(clip.start, rate, request.effect_time_offset);
-        let duration = quantise(clip.duration, rate);
+        //
+        // The start and the end are each rounded as instants on the grid,
+        // and the duration is what lies between them. Rounding the start and
+        // the duration separately let two clips that touch on the timeline
+        // round apart: one frame between them belonged to neither, and the
+        // lane beneath flashed through a hard cut for that frame.
+        let (start, duration) = frame_span(clip.start, clip.duration, rate, request.effect_time_offset);
         if duration.is_zero() {
             continue;
         }
@@ -581,6 +586,21 @@ fn overscan_of(clip: &ExportClip) -> f64 {
     }
 }
 
+/// A clip's `start` and `duration` in seconds as a start and a duration on
+/// the frame grid: both edges rounded as instants, so a clip ending where
+/// another starts ends on the very frame that one starts on, whatever
+/// fractions of a frame either carries. A clip that rounds to nothing has a
+/// zero duration, never a negative one.
+pub(crate) fn frame_span(start: f64, duration: f64, rate: FrameRate, origin: f64) -> (Rational, Rational) {
+    let first = quantise_at(start, rate, origin);
+    let end = quantise_at(start + duration.max(0.0), rate, origin);
+    if end > first {
+        (first, end - first)
+    } else {
+        (first, Rational::ZERO)
+    }
+}
+
 pub(crate) fn quantise(seconds: f64, rate: FrameRate) -> Rational {
     rate.time_of_frame((seconds * rate.fps().as_f64()).round().max(0.0) as i64)
 }
@@ -589,4 +609,41 @@ pub(crate) fn quantise(seconds: f64, rate: FrameRate) -> Rational {
 /// keeps the raw local placement; video retains its original global grid.
 pub(crate) fn quantise_at(seconds: f64, rate: FrameRate, origin: f64) -> Rational {
     quantise(seconds + origin, rate) - quantise(origin, rate)
+}
+
+#[cfg(test)]
+mod frame_span_tests {
+    use super::*;
+
+    /// Carlos's hard cut: two clips that touch at a fraction of a frame
+    /// must share the boundary frame, with no frame left to the lane below.
+    #[test]
+    fn touching_clips_leave_no_frame_between_them() {
+        let rate = FrameRate::THIRTY;
+        // 0.45 of a frame in, 30.45 frames long: the old rounding ended it
+        // on frame 30 while the next clip started on frame 31.
+        let (a_start, a_duration) = frame_span(0.015, 1.015, rate, 0.0);
+        let (b_start, _) = frame_span(1.03, 1.0, rate, 0.0);
+        assert_eq!(a_start + a_duration, b_start);
+    }
+
+    #[test]
+    fn touching_clips_meet_at_every_offset() {
+        let rate = FrameRate::THIRTY;
+        for origin in [0.0, 0.01, 0.5, 12.345] {
+            for step in 0..200 {
+                let start = f64::from(step) * 0.00731;
+                let length = 0.4 + f64::from(step) * 0.00377;
+                let (a_start, a_duration) = frame_span(start, length, rate, origin);
+                let (b_start, _) = frame_span(start + length, 1.0, rate, origin);
+                assert_eq!(a_start + a_duration, b_start, "start {start} length {length} origin {origin}");
+            }
+        }
+    }
+
+    #[test]
+    fn a_clip_shorter_than_a_frame_never_runs_backwards() {
+        let (_, duration) = frame_span(0.0166, 0.001, FrameRate::THIRTY, 0.0);
+        assert!(duration >= Rational::ZERO);
+    }
 }
