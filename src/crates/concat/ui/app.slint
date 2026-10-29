@@ -15,6 +15,11 @@ import "../../concat-text/fonts/HankenGrotesk-Medium.ttf";
 import "../../concat-text/fonts/HankenGrotesk-SemiBold.ttf";
 import "../../concat-text/fonts/HankenGrotesk-Bold.ttf";
 import "../../concat-text/fonts/HankenGrotesk-Italic.ttf";
+import "../../concat-text/fonts/Manrope-Regular.ttf";
+import "../../concat-text/fonts/Manrope-Medium.ttf";
+import "../../concat-text/fonts/Manrope-SemiBold.ttf";
+import "../../concat-text/fonts/Manrope-Bold.ttf";
+import "../../concat-text/fonts/Manrope-ExtraBold.ttf";
 
 import { Theme } from "theme/theme.slint";
 import { Bezier, Curves, Fmt, Focus, Payload } from "util.slint";
@@ -181,11 +186,11 @@ export {
     NewVoiceData,
 }
 export component App inherits Window {
-    title: "Concat";
+    title: "SynviaADS";
     // The taskbar's and Alt-Tab's picture on Windows, and the window
     // list's on X11. A Mac takes its Dock icon from the bundle and ignores
     // this; the .exe's own, for Explorer, is embedded by build.rs.
-    icon: @image-url("../../../../assets/icons/concat_logo_256.png");
+    icon: @image-url("../../../../assets/synvia/icon_256.png");
     // Where the strip carries its own window buttons the platform's
     // decorations are not wanted, and this is the property Slint keeps
     // them off with: the winit backend re-applies `no-frame` to the
